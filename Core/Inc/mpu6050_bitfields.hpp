@@ -9,7 +9,9 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace IMU::BitFields {
+using namespace Utility;
+
+namespace BitFields {
 
     struct MPU6050 {
     public:
@@ -81,7 +83,7 @@ namespace IMU::BitFields {
             DIV_258 = 0x8,
         };
 
-        enum struct SlaveNum : std::uint8_t {
+        enum struct SlaveNum {
             SLAVE1 = 1,
             SLAVE2 = 2,
             SLAVE3 = 3,
@@ -148,7 +150,7 @@ namespace IMU::BitFields {
 
         MPU6050() noexcept = default;
 
-        MPU6050(I2CDevice const i2c_device,
+        MPU6050(I2CDevice&& i2c_device,
                 std::uint32_t const sampling_rate,
                 GyroRange const gyro_range,
                 AccelRange const accel_range,
@@ -200,6 +202,24 @@ namespace IMU::BitFields {
         static constexpr std::uint32_t GYRO_OUTPUT_RATE_DLPF_DIS_HZ{8000};
         static constexpr std::uint32_t ACCEL_OUTPUT_RATE_HZ{1000};
 
+        void device_reset() const noexcept;
+        void device_wake_up() const noexcept;
+
+        std::uint8_t get_device_id() const noexcept;
+        bool is_valid_device_id() const noexcept;
+
+        void set_smplrt_div(std::uint8_t const sampling_rate, DLPF const dlpf) const noexcept;
+        void set_config(ExtSync const ext_sync, DLPF const dlpf) const noexcept;
+        void set_gyro_config(bool const x_standby,
+                             bool const y_standby,
+                             bool const z_standby,
+                             GyroRange const gyro_range) const noexcept;
+        void set_accel_config(bool const x_standby,
+                              bool const y_standby,
+                              bool const z_standby,
+                              AccelRange const accel_range,
+                              DHPF const dhpf) const noexcept;
+
         AccelRaw get_acceleration_raw() const noexcept;
         Raw get_acceleration_x_raw() const noexcept;
         Raw get_acceleration_y_raw() const noexcept;
@@ -221,41 +241,7 @@ namespace IMU::BitFields {
 
         void deinitialize() noexcept;
 
-        void device_reset() const noexcept;
-        void device_wake_up() const noexcept;
-
-        std::uint8_t get_device_id() const noexcept;
-        bool is_valid_device_id() const noexcept;
-
-        void set_gyro_offset(bool const aux_vddio,
-                             std::uint8_t const x_offset,
-                             std::uint8_t const y_offset,
-                             std::uint8_t const z_offset) const noexcept;
-
-        void set_fine_gain(std::uint8_t const x_fine_gain,
-                           std::uint8_t const y_fine_gain,
-                           std::uint8_t const z_fine_gain) const noexcept;
-
-        void set_accel_offset(std::uint16_t const x_offset,
-                              std::uint16_t const y_offset,
-                              std::uint16_t const z_offset) const noexcept;
-
-        void set_sampling_rate(std::uint8_t const sampling_rate, DLPF const dlpf) const noexcept;
-
-        void set_config(ExtSync const ext_sync, DLPF const dlpf) const noexcept;
-
-        void set_gyro_config(bool const x_standby,
-                             bool const y_standby,
-                             bool const z_standby,
-                             GyroRange const gyro_range) const noexcept;
-
-        void set_accel_config(bool const x_standby,
-                              bool const y_standby,
-                              bool const z_standby,
-                              AccelRange const accel_range,
-                              DHPF const dhpf) const noexcept;
-
-        void set_xg_offs_tc_register(XG_OFFS_TC const xg_offs_tc) const noexcept;
+        void set_xg_offs_register(XG_OFFS_TC const xg_offs_tc) const noexcept;
         void set_yg_offs_tc_register(YG_OFFS_TC const yg_offs_tc) const noexcept;
         void set_zg_offs_tc_register(ZG_OFFS_TC const zg_offs_tc) const noexcept;
 
@@ -325,7 +311,7 @@ namespace IMU::BitFields {
 
         EXT_SENS_DATA get_ext_sens_data_register(std::uint8_t const position) const noexcept;
 
-        MOT_DETECT_STATUS get_mot_detect_status_register() const noexcept;
+        MOT_DETECT_STATUS get_mot_detect_status_registet() const noexcept;
 
         void set_i2c_slv_do_register(SlaveNum const slave_num, I2C_SLV_DO const i2c_slv_do) const noexcept;
 
@@ -365,6 +351,6 @@ namespace IMU::BitFields {
         Scaled accel_scale_{};
     };
 
-}; // namespace IMU::BitFields
+}; // namespace BitFields
 
 #endif // MPU6050_BITFIELDS_HPP

@@ -77,13 +77,11 @@ namespace Utility {
     [[nodiscard]] Bytes<NUM_BITS / 8> bits_to_bytes(Bits<NUM_BITS> const& bits) noexcept
     {
         static_assert(NUM_BITS % 8 == 0);
-        Bytes<NUM_BITS / 8> bytes;
+        Bytes<NUM_BITS / 8> bytes{};
         for (std::size_t i = 0; i < bytes.size(); ++i) {
             for (std::size_t j = 0; j < 8; ++j) {
                 if (bits[i * 8 + j]) {
-                    bytes[i] |= (1 << j);
-                } else {
-                    bytes[i] &= ~(1 << j);
+                    bytes[i] |= (1U << j);
                 }
             }
         }
@@ -93,13 +91,11 @@ namespace Utility {
     template <std::size_t NUM_BYTES>
     [[nodiscard]] Bits<8 * NUM_BYTES> bytes_to_bits(Bytes<NUM_BYTES> const& bytes) noexcept
     {
-        Bits<8 * NUM_BYTES> bits;
+        Bits<8 * NUM_BYTES> bits{};
         for (std::size_t i = 0; i < bytes.size(); ++i) {
             for (std::size_t j = 0; j < 8; ++j) {
                 if (bytes[i] & (1 << j)) {
                     bits[i * 8 + j] = 1;
-                } else {
-                    bits[i * 8 + j] = 0;
                 }
             }
         }

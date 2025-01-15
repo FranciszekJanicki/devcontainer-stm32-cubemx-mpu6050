@@ -27,11 +27,11 @@ int main()
     MX_USART2_UART_Init();
     MX_I2C1_Init();
 
-    using namespace IMU;
+    using namespace Utility;
 
     I2CDevice i2c_device{&hi2c1, std::to_underlying(MPU6050::DevAddress::AD0_LOW)};
 
-    MPU6050 mpu6050{i2c_device,
+    MPU6050 mpu6050{std::move(i2c_device),
                     200U,
                     MPU6050::GyroRange::GYRO_FS_250,
                     MPU6050::AccelRange::ACCEL_FS_2,

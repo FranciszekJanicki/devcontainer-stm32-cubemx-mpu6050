@@ -13,13 +13,20 @@
 #include <cstdio>
 #include <cstring>
 
-namespace IMU {
+namespace Utility {
 
-    using TimerHandle = TIM_HandleTypeDef*;
+    using TIMHandle = TIM_HandleTypeDef*;
     using GPIOHandle = GPIO_TypeDef*;
     using UARTHandle = UART_HandleTypeDef*;
     using I2CBusHandle = I2C_HandleTypeDef*;
 
-}; // namespace IMU
+}; // namespace Utility
+
+namespace Linalg {
+
+    template <typename Type>
+    concept Arithmetic = std::is_arithmetic_v<Type>;
+
+};
 
 #endif // COMMON_HPP
