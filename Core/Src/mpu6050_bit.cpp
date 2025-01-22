@@ -1,18 +1,16 @@
-#include "mpu6050_bitfields.hpp"
+#include "mpu6050_bit.hpp"
 #include "common.hpp"
 #include "i2c.h"
 #include "i2c_device.hpp"
 #include "main.h"
-#include "mpu_register_map.hpp"
+#include "mpu6050_bit_registers.hpp"
 #include <bit>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <utility>
 
-using namespace BitFields;
-using namespace Utility;
-using Scaled = MPU6050::Scaled;
+using Scaled = BitFields::MPU6050::Scaled;
 using GyroScaled = MPU6050::GyroScaled;
 using AccelScaled = MPU6050::AccelScaled;
 using RollPitchYaw = MPU6050::RollPitchYaw;

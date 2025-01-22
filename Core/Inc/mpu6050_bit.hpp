@@ -1,9 +1,9 @@
-#ifndef MPU6050_BITFIELDS_HPP
-#define MPU6050_BITFIELDS_HPP
+#ifndef MPU6050_BIT_HPP
+#define MPU6050_BIT_HPP
 
 #include "common.hpp"
 #include "i2c_device.hpp"
-#include "mpu_register_map.hpp"
+#include "mpu6050_registers.hpp"
 #include "stm32l4xx_hal.h"
 #include "vector3d.hpp"
 #include <cstddef>
@@ -11,7 +11,7 @@
 
 using namespace Utility;
 
-namespace BitFields {
+namespace Bit {
 
     struct MPU6050 {
     public:
@@ -351,6 +351,6 @@ namespace BitFields {
         Scaled accel_scale_{};
     };
 
-}; // namespace BitFields
+}; // namespace Bit
 
 #endif // MPU6050_BITFIELDS_HPP
