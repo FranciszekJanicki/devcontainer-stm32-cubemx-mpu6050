@@ -1,18 +1,17 @@
----
-Checks: "*,
-        -modernize-use-trailing-return-type,
-        -readability-else-after-return,
-        -readability-static-accessed-through-instance,
-        -readability-avoid-const-params-in-decls,
-        "
+Checks: >
+  *,
+  -modernize-use-trailing-return-type,
+  -readability-else-after-return,
+  -readability-static-accessed-through-instance,
+  -readability-avoid-const-params-in-decls,
+  +modernize-use-trailing-return-type
 
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
-FormatStyle:     none
+FormatStyle: none
 
 CheckOptions:
   - key: readability-identifier-length.IgnoredVariableNames
     value: 'x|y|z'
   - key: readability-identifier-length.IgnoredParameterNames
     value: 'x|y|z'
-    

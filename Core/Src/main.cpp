@@ -4,6 +4,7 @@
 #include "i2c_device.hpp"
 #include "mpu6050.hpp"
 #include "mpu6050_dmp.hpp"
+#include "mpu6050_bit.hpp"
 #include "system_clock.h"
 #include "usart.h"
 #include <cstdio>

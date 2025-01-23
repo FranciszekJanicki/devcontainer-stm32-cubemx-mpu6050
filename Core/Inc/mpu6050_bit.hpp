@@ -3,13 +3,11 @@
 
 #include "common.hpp"
 #include "i2c_device.hpp"
-#include "mpu6050_registers.hpp"
+#include "mpu6050_bit_registers.hpp"
 #include "stm32l4xx_hal.h"
 #include "vector3d.hpp"
 #include <cstddef>
 #include <cstdint>
-
-using namespace Utility;
 
 namespace Bit {
 
@@ -147,9 +145,9 @@ namespace Bit {
         using Raw = std::int16_t;
         using GyroRaw = Linalg::Vector3D<Raw>;
         using AccelRaw = Linalg::Vector3D<Raw>;
+        using I2CDevice = Utility::I2CDevice;
 
         MPU6050() noexcept = default;
-
         MPU6050(I2CDevice&& i2c_device,
                 std::uint32_t const sampling_rate,
                 GyroRange const gyro_range,
@@ -343,12 +341,12 @@ namespace Bit {
 
         WHO_AM_I get_who_am_i_register() const noexcept;
 
-        bool initialized_{false};
-
         I2CDevice i2c_device_{};
 
         Scaled gyro_scale_{};
         Scaled accel_scale_{};
+
+        bool initialized_{false};
     };
 
 }; // namespace Bit

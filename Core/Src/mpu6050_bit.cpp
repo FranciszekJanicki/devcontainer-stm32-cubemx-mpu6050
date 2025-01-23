@@ -10,7 +10,8 @@
 #include <cstdio>
 #include <utility>
 
-using Scaled = BitFields::MPU6050::Scaled;
+using namespace Bit;
+using Scaled = MPU6050::Scaled;
 using GyroScaled = MPU6050::GyroScaled;
 using AccelScaled = MPU6050::AccelScaled;
 using RollPitchYaw = MPU6050::RollPitchYaw;
@@ -25,7 +26,7 @@ using IntDrive = MPU6050::IntDrive;
 using IntMode = MPU6050::IntMode;
 using IntClear = MPU6050::IntClear;
 
-namespace BitFields {
+namespace Bit {
 
     MPU6050::MPU6050(I2CDevice&& i2c_device,
                      std::uint32_t const sampling_rate,
@@ -48,105 +49,66 @@ namespace BitFields {
 
     AccelScaled MPU6050::get_acceleration_scaled() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<AccelScaled>(this->get_acceleration_raw()) / this->accel_scale_;
     }
 
     Scaled MPU6050::get_acceleration_x_scaled() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<Scaled>(this->get_acceleration_x_raw()) / this->accel_scale_;
     }
 
     Scaled MPU6050::get_acceleration_y_scaled() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<Scaled>(this->get_acceleration_y_raw()) / this->accel_scale_;
     }
 
     Scaled MPU6050::get_acceleration_z_scaled() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<Scaled>(this->get_acceleration_z_raw()) / this->accel_scale_;
     }
 
     Scaled MPU6050::get_temperature_celsius() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<Scaled>(this->get_temperature_raw()) / 340.0f + 36.53F;
     }
 
     GyroScaled MPU6050::get_rotation_scaled() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<GyroScaled>(this->get_rotation_raw()) / this->gyro_scale_;
     }
 
     Scaled MPU6050::get_rotation_x_scaled() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<Scaled>(this->get_rotation_x_raw()) / this->gyro_scale_;
     }
 
     Scaled MPU6050::get_rotation_y_scaled() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<Scaled>(this->get_rotation_y_raw()) / this->gyro_scale_;
     }
 
     Scaled MPU6050::get_rotation_z_scaled() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return static_cast<Scaled>(this->get_rotation_z_raw()) / this->gyro_scale_;
     }
 
     RollPitchYaw MPU6050::get_roll_pitch_yaw() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return accel_to_roll_pitch_yaw(this->get_acceleration_scaled());
     }
 
     Scaled MPU6050::get_roll() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return accel_to_roll(this->get_acceleration_scaled());
     }
 
     Scaled MPU6050::get_pitch() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return accel_to_pitch(this->get_acceleration_scaled());
     }
 
     Scaled MPU6050::get_yaw() const noexcept
     {
-        if (!this->initialized_) {
-            std::unreachable();
-        }
         return accel_to_yaw(this->get_acceleration_scaled());
     }
 
@@ -305,41 +267,65 @@ namespace BitFields {
 
     Raw MPU6050::get_acceleration_x_raw() const noexcept
     {
+        if (!this->initialized_) {
+            std::unreachable();
+        }
         return std::bit_cast<Raw>(this->get_accel_xout_registers());
     }
 
     Raw MPU6050::get_acceleration_y_raw() const noexcept
     {
+        if (!this->initialized_) {
+            std::unreachable();
+        }
         return std::bit_cast<Raw>(this->get_accel_yout_registers());
     }
 
     Raw MPU6050::get_acceleration_z_raw() const noexcept
     {
+        if (!this->initialized_) {
+            std::unreachable();
+        }
         return std::bit_cast<Raw>(this->get_accel_zout_registers());
     }
 
     Raw MPU6050::get_temperature_raw() const noexcept
     {
+        if (!this->initialized_) {
+            std::unreachable();
+        }
         return std::bit_cast<Raw>(this->get_temp_out_registers());
     }
 
     GyroRaw MPU6050::get_rotation_raw() const noexcept
     {
+        if (!this->initialized_) {
+            std::unreachable();
+        }
         return GyroRaw{this->get_rotation_x_raw(), this->get_rotation_y_raw(), this->get_rotation_z_raw()};
     }
 
     Raw MPU6050::get_rotation_x_raw() const noexcept
     {
+        if (!this->initialized_) {
+            std::unreachable();
+        }
         return std::bit_cast<Raw>(this->get_gyro_xout_registers());
     }
 
     Raw MPU6050::get_rotation_y_raw() const noexcept
     {
+        if (!this->initialized_) {
+            std::unreachable();
+        }
         return std::bit_cast<Raw>(this->get_gyro_yout_registers());
     }
 
     Raw MPU6050::get_rotation_z_raw() const noexcept
     {
+        if (!this->initialized_) {
+            std::unreachable();
+        }
         return std::bit_cast<Raw>(this->get_gyro_zout_registers());
     }
 
@@ -692,4 +678,4 @@ namespace BitFields {
         return std::bit_cast<WHO_AM_I>(this->i2c_device_.read_byte(std::to_underlying(RA::WHO_AM_I)));
     }
 
-}; // namespace BitFields
+}; // namespace Bit
