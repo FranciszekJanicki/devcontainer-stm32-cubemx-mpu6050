@@ -2,13 +2,13 @@
 #define UTILITY_HPP
 
 #include "stm32l4xx_hal.h"
+#include "stm32l4xx_hal_tim.h"
 #include <array>
 #include <bit>
 #include <bitset>
 #include <concepts>
 #include <cstdint>
 #include <cstdlib>
-#include "stm32l4xx_hal_tim.h"
 #include <cstring>
 
 namespace Utility {

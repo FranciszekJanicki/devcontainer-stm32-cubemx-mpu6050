@@ -48,10 +48,18 @@ namespace Utility {
         return this->read_words<1UL>(reg_address)[0];
     }
 
-
-    void I2CDevice::read_bytes(std::uint8_t const reg_address, std::uint8_t *const bytes, std::size_t const size) const noexcept {
+    void I2CDevice::read_bytes(std::uint8_t const reg_address,
+                               std::uint8_t* const bytes,
+                               std::size_t const size) const noexcept
+    {
         if (this->initialized_) {
-            HAL_I2C_Mem_Read(this->i2c_bus_, this->dev_address_ << 1, reg_address, sizeof(reg_address), bytes, size, TIMEOUT);
+            HAL_I2C_Mem_Read(this->i2c_bus_,
+                             this->dev_address_ << 1,
+                             reg_address,
+                             sizeof(reg_address),
+                             bytes,
+                             size,
+                             TIMEOUT);
         }
     }
 
@@ -82,9 +90,18 @@ namespace Utility {
         this->write_words(reg_address, std::array<std::uint16_t, 1UL>{word});
     }
 
-    void I2CDevice::write_bytes(std::uint8_t const reg_address, std::uint8_t* const bytes, std::size_t const size) const noexcept {
+    void I2CDevice::write_bytes(std::uint8_t const reg_address,
+                                std::uint8_t* const bytes,
+                                std::size_t const size) const noexcept
+    {
         if (this->initialized_) {
-            HAL_I2C_Mem_Write(this->i2c_bus_, this->dev_address_ << 1, reg_address, sizeof(reg_address), bytes, size, TIMEOUT);
+            HAL_I2C_Mem_Write(this->i2c_bus_,
+                              this->dev_address_ << 1,
+                              reg_address,
+                              sizeof(reg_address),
+                              bytes,
+                              size,
+                              TIMEOUT);
         }
     }
 

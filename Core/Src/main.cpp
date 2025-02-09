@@ -3,7 +3,6 @@
 #include "i2c.h"
 #include "i2c_device.hpp"
 #include "mpu6050.hpp"
-#include "mpu6050_dmp.hpp"
 #include "system_clock.h"
 #include "usart.h"
 #include <cstdio>
@@ -37,14 +36,12 @@ int main()
                     MPU6050::GyroRange::GYRO_FS_250,
                     MPU6050::AccelRange::ACCEL_FS_2,
                     MPU6050::DLPF::BW_256,
-                    MPU6050::DHPF::DHPF_RESET};
-
-    using namespace MPU6050;
-    DMP mpu6050_dmp{std::move(mpu6050)};
+                    MPU6050::DHPF::DHPF_RESET,
+                    MPU6050::ExtSync::DISABLED};
 
     while (true) {
         if (timer_elapsed) {
-            auto const& [roll, pitch, yaw]{mpu6050_dmp.get_roll_pitch_yaw()};
+            auto const& [roll, pitch, yaw]{mpu6050.get_roll_pitch_yaw().value()};
             printf("roll: %f, pitch %f, yaw: %f\n\r", roll, pitch, yaw);
             timer_elapsed = false;
         }
