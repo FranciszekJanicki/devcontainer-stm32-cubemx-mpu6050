@@ -1,5 +1,4 @@
 #include "mpu6050.hpp"
-#include "common.hpp"
 #include "i2c.h"
 #include "i2c_device.hpp"
 #include "main.h"
@@ -9,24 +8,12 @@
 #include <cstdio>
 #include <utility>
 
-using Scaled = MPU6050::MPU6050::Scaled;
-using GyroScaled = MPU6050::MPU6050::GyroScaled;
-using AccelScaled = MPU6050::MPU6050::AccelScaled;
-using RollPitchYaw = MPU6050 ::MPU6050::RollPitchYaw;
-using Scaled = MPU6050::MPU6050::Scaled;
-using Raw = MPU6050::MPU6050::Raw;
-using GyroRaw = MPU6050::MPU6050::GyroRaw;
-using AccelRaw = MPU6050::MPU6050::AccelRaw;
-using DevAddress = MPU6050::MPU6050::DevAddress;
-using Clock = MPU6050::MPU6050::Clock;
-using IntLatch = MPU6050::MPU6050::IntLatch;
-using IntDrive = MPU6050::MPU6050::IntDrive;
-using IntMode = MPU6050::MPU6050::IntMode;
-using IntClear = MPU6050::MPU6050::IntClear;
+template <typename T>
+using Vec3D = Utility::Vector3D<T>;
 
 namespace MPU6050 {
 
-    Scaled MPU6050::gyro_range_to_scale(GyroRange const gyro_range) noexcept
+    float MPU6050::gyro_range_to_scale(GyroRange const gyro_range) noexcept
     {
         switch (gyro_range) {
             case GyroRange::GYRO_FS_250:
@@ -42,7 +29,7 @@ namespace MPU6050 {
         }
     }
 
-    Scaled MPU6050::accel_range_to_scale(AccelRange const accel_range) noexcept
+    float MPU6050::accel_range_to_scale(AccelRange const accel_range) noexcept
     {
         switch (accel_range) {
             case AccelRange::ACCEL_FS_2:
@@ -67,17 +54,17 @@ namespace MPU6050 {
         }
     }
 
-    RollPitchYaw MPU6050::accel_to_roll_pitch_yaw(AccelScaled const& accel_scaled) noexcept
+    Vec3D<float> MPU6050::accel_to_roll_pitch_yaw(Vec3D<float> const& accel_scaled) noexcept
     {
-        return RollPitchYaw{accel_to_roll(accel_scaled), accel_to_pitch(accel_scaled), accel_to_yaw(accel_scaled)};
+        return Vec3D<float>{accel_to_roll(accel_scaled), accel_to_pitch(accel_scaled), accel_to_yaw(accel_scaled)};
     }
 
-    Scaled MPU6050::accel_to_roll(AccelScaled const& accel_scaled) noexcept
+    float MPU6050::accel_to_roll(Vec3D<float> const& accel_scaled) noexcept
     {
         return std::atan2(accel_scaled.y, accel_scaled.z) * 180.0F / 3.1416F;
     }
 
-    Scaled MPU6050::accel_to_pitch(AccelScaled const& accel_scaled) noexcept
+    float MPU6050::accel_to_pitch(Vec3D<float> const& accel_scaled) noexcept
     {
         return -(std::atan2(accel_scaled.x,
                             std::sqrt(accel_scaled.y * accel_scaled.y + accel_scaled.z * accel_scaled.z)) *
@@ -85,7 +72,7 @@ namespace MPU6050 {
                3.1416F;
     }
 
-    Scaled MPU6050::accel_to_yaw(AccelScaled const& accel_scaled) noexcept
+    float MPU6050::accel_to_yaw(Vec3D<float> const& accel_scaled) noexcept
     {
         return {};
     }
@@ -108,74 +95,74 @@ namespace MPU6050 {
         this->deinitialize();
     }
 
-    Scaled MPU6050::get_temperature_celsius() const noexcept
+    float MPU6050::get_temperature_celsius() const noexcept
     {
-        return static_cast<Scaled>(this->get_temperature_raw()) / 340.0F + 36.53F;
+        return static_cast<float>(this->get_temperature_raw()) / 340.0F + 36.53F;
     }
 
-    Scaled MPU6050::get_acceleration_x_scaled() const noexcept
+    float MPU6050::get_acceleration_x_scaled() const noexcept
     {
-        return static_cast<Scaled>(this->get_acceleration_x_raw()) / this->accel_scale_;
+        return static_cast<float>(this->get_acceleration_x_raw()) / this->accel_scale_;
     }
 
-    Scaled MPU6050::get_acceleration_y_scaled() const noexcept
+    float MPU6050::get_acceleration_y_scaled() const noexcept
     {
-        return static_cast<Scaled>(this->get_acceleration_y_raw()) / this->accel_scale_;
+        return static_cast<float>(this->get_acceleration_y_raw()) / this->accel_scale_;
     }
 
-    Scaled MPU6050::get_acceleration_z_scaled() const noexcept
+    float MPU6050::get_acceleration_z_scaled() const noexcept
     {
-        return static_cast<Scaled>(this->get_acceleration_z_raw()) / this->accel_scale_;
+        return static_cast<float>(this->get_acceleration_z_raw()) / this->accel_scale_;
     }
 
-    AccelScaled MPU6050::get_acceleration_scaled() const noexcept
+    Vec3D<float> MPU6050::get_acceleration_scaled() const noexcept
     {
-        return static_cast<AccelScaled>(this->get_acceleration_raw()) / this->accel_scale_;
+        return static_cast<Vec3D<float>>(this->get_acceleration_raw()) / this->accel_scale_;
     }
 
-    Scaled MPU6050::get_rotation_x_scaled() const noexcept
+    float MPU6050::get_rotation_x_scaled() const noexcept
     {
-        return static_cast<Scaled>(this->get_rotation_x_raw()) / this->gyro_scale_;
+        return static_cast<float>(this->get_rotation_x_raw()) / this->gyro_scale_;
     }
 
-    Scaled MPU6050::get_rotation_y_scaled() const noexcept
+    float MPU6050::get_rotation_y_scaled() const noexcept
     {
-        return static_cast<Scaled>(this->get_rotation_y_raw()) / this->gyro_scale_;
+        return static_cast<float>(this->get_rotation_y_raw()) / this->gyro_scale_;
     }
 
-    Scaled MPU6050::get_rotation_z_scaled() const noexcept
+    float MPU6050::get_rotation_z_scaled() const noexcept
     {
-        return static_cast<Scaled>(this->get_rotation_z_raw()) / this->gyro_scale_;
+        return static_cast<float>(this->get_rotation_z_raw()) / this->gyro_scale_;
     }
 
-    GyroScaled MPU6050::get_rotation_scaled() const noexcept
+    Vec3D<float> MPU6050::get_rotation_scaled() const noexcept
     {
-        return static_cast<GyroScaled>(this->get_rotation_raw()) / this->gyro_scale_;
+        return static_cast<Vec3D<float>>(this->get_rotation_raw()) / this->gyro_scale_;
     }
 
-    RollPitchYaw MPU6050::get_roll_pitch_yaw() const noexcept
+    Vec3D<float> MPU6050::get_roll_pitch_yaw() const noexcept
     {
         return accel_to_roll_pitch_yaw(this->get_acceleration_scaled());
     }
 
-    Scaled MPU6050::get_roll() const noexcept
+    float MPU6050::get_roll() const noexcept
     {
         return accel_to_roll(this->get_acceleration_scaled());
     }
 
-    Scaled MPU6050::get_pitch() const noexcept
+    float MPU6050::get_pitch() const noexcept
     {
         return accel_to_pitch(this->get_acceleration_scaled());
     }
 
-    Scaled MPU6050::get_yaw() const noexcept
+    float MPU6050::get_yaw() const noexcept
     {
         return accel_to_yaw(this->get_acceleration_scaled());
     }
 
     bool MPU6050::is_valid_device_id() const noexcept
     {
-        if (this->get_device_id() == this->i2c_device_.device_address()) {
+        if (this->get_device_id() == this->i2c_device_.dev_address()) {
             printf("VAALID\n\r");
             printf("VAALID\n\r");
             printf("VAALID\n\r");
@@ -789,89 +776,89 @@ namespace MPU6050 {
                                           std::to_underlying(INT_STATUS::DATA_RDY_BIT));
     }
 
-    AccelRaw MPU6050::get_acceleration_raw() const noexcept
+    Vec3D<std::int16_t> MPU6050::get_acceleration_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<6>(std::to_underlying(RA::ACCEL_XOUT_H));
-        return AccelRaw{(static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]),
-                        (static_cast<Raw>(buffer[2]) << 8) | static_cast<Raw>(buffer[3]),
-                        (static_cast<Raw>(buffer[4]) << 8) | static_cast<Raw>(buffer[5])};
+        return Vec3D<std::int16_t>{(static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]),
+                        (static_cast<std::int16_t>(buffer[2]) << 8) | static_cast<std::int16_t>(buffer[3]),
+                        (static_cast<std::int16_t>(buffer[4]) << 8) | static_cast<std::int16_t>(buffer[5])};
     }
 
-    Raw MPU6050::get_acceleration_x_raw() const noexcept
+    std::int16_t MPU6050::get_acceleration_x_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<2>(std::to_underlying(RA::ACCEL_XOUT_H));
-        return (static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]);
+        return (static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]);
     }
 
-    Raw MPU6050::get_acceleration_y_raw() const noexcept
+    std::int16_t MPU6050::get_acceleration_y_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<2>(std::to_underlying(RA::ACCEL_YOUT_H));
-        return (static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]);
+        return (static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]);
     }
 
-    Raw MPU6050::get_acceleration_z_raw() const noexcept
+    std::int16_t MPU6050::get_acceleration_z_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<2>(std::to_underlying(RA::ACCEL_ZOUT_H));
-        return (static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]);
+        return (static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]);
     }
 
-    Raw MPU6050::get_temperature_raw() const noexcept
+    std::int16_t MPU6050::get_temperature_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<2>(std::to_underlying(RA::TEMP_OUT_H));
-        return (static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]);
+        return (static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]);
     }
 
-    GyroRaw MPU6050::get_rotation_raw() const noexcept
+    Vec3D<std::int16_t> MPU6050::get_rotation_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<6>(std::to_underlying(RA::GYRO_XOUT_H));
-        return GyroRaw{(static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]),
-                       (static_cast<Raw>(buffer[2]) << 8) | static_cast<Raw>(buffer[3]),
-                       (static_cast<Raw>(buffer[4]) << 8) | static_cast<Raw>(buffer[5])};
+        return Vec3D<std::int16_t>{(static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]),
+                       (static_cast<std::int16_t>(buffer[2]) << 8) | static_cast<std::int16_t>(buffer[3]),
+                       (static_cast<std::int16_t>(buffer[4]) << 8) | static_cast<std::int16_t>(buffer[5])};
     }
 
-    Raw MPU6050::get_rotation_x_raw() const noexcept
+    std::int16_t MPU6050::get_rotation_x_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<2>(std::to_underlying(RA::GYRO_XOUT_H));
-        return (static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]);
+        return (static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]);
     }
 
-    Raw MPU6050::get_rotation_y_raw() const noexcept
+    std::int16_t MPU6050::get_rotation_y_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<2>(std::to_underlying(RA::GYRO_YOUT_H));
-        return (static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]);
+        return (static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]);
     }
 
-    Raw MPU6050::get_rotation_z_raw() const noexcept
+    std::int16_t MPU6050::get_rotation_z_raw() const noexcept
     {
         if (!this->initialized_) {
             std::unreachable();
         }
         auto buffer = this->i2c_device_.read_bytes<2>(std::to_underlying(RA::GYRO_ZOUT_H));
-        return (static_cast<Raw>(buffer[0]) << 8) | static_cast<Raw>(buffer[1]);
+        return (static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]);
     }
 
     std::uint8_t MPU6050::get_external_sensor_byte(std::uint8_t const position) const noexcept

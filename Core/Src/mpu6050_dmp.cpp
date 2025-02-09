@@ -3,46 +3,43 @@
 #include "mpu6050_dmp_memory.hpp"
 #include "mpu6050_registers.hpp"
 
-using namespace MPU6050;
-using Scaled = DMP::Scaled;
-using Raw = DMP::Raw;
-using QuaternionRaw = DMP::QuaternionRaw;
-using QuaternionScaled = DMP::QuaternionScaled;
-using RollPitchYaw = DMP::RollPitchYaw;
-using Gravity = DMP::Gravity;
-using DMP_Packet = DMP::DMP_Packet;
+template <typename T>
+using Vec3D = Utility::Vector3D<T>;
+
+template <typename T>
+using Quat3D = Utility::Quaternion3D<T>;
 
 namespace MPU6050 {
 
-    Gravity DMP::quaternion_to_gravity(QuaternionScaled const& quaternion) noexcept
+    Vec3D<float> DMP::quaternion_to_gravity(Quat3D<float> const& quaternion) noexcept
     {
-        return Gravity{2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y),
+        return Vec3D<float>{2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y),
                        2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z),
                        quaternion.w * quaternion.w - quaternion.x * quaternion.x - quaternion.y * quaternion.y +
                            quaternion.z * quaternion.z};
     }
 
-    RollPitchYaw DMP::quaternion_to_roll_pitch_yaw(QuaternionScaled const& quaternion) noexcept
+    Vec3D<float> DMP::quaternion_to_roll_pitch_yaw(Quat3D<float> const& quaternion) noexcept
     {
-        return RollPitchYaw{quaternion_to_roll(quaternion),
+        return Vec3D<float>{quaternion_to_roll(quaternion),
                             quaternion_to_pitch(quaternion),
                             quaternion_to_yaw(quaternion)};
     }
 
-    Scaled DMP::quaternion_to_roll(QuaternionScaled const& quaternion) noexcept
+    float DMP::quaternion_to_roll(Quat3D<float> const& quaternion) noexcept
     {
         auto const gravity{quaternion_to_gravity(quaternion)};
         return std::atan2(gravity.y, gravity.z);
     }
 
-    Scaled DMP::quaternion_to_pitch(QuaternionScaled const& quaternion) noexcept
+    float DMP::quaternion_to_pitch(Quat3D<float> const& quaternion) noexcept
     {
         auto const gravity{quaternion_to_gravity(quaternion)};
         auto const pitch{std::atan2(gravity.x, std::sqrt(gravity.y * gravity.y + gravity.z * gravity.z))};
         return (gravity.z < 0) ? (pitch > 0 ? 3.1416F - pitch : -3.1416F - pitch) : pitch;
     }
 
-    Scaled DMP::quaternion_to_yaw(QuaternionScaled const& quaternion) noexcept
+    float DMP::quaternion_to_yaw(Quat3D<float> const& quaternion) noexcept
     {
         return std::atan2(2 * quaternion.x * quaternion.y - 2 * quaternion.w * quaternion.z,
                           2 * quaternion.w * quaternion.w + 2 * quaternion.x * quaternion.x - 1);
@@ -203,9 +200,9 @@ namespace MPU6050 {
         this->mpu6050_.i2c_device_.write_word(std::to_underlying(RA::ZG_OFFS_USRH), offset);
     }
 
-    DMP_Packet DMP::get_dmp_packet() const noexcept
+    std::array<std::uint8_t, 42UL> DMP::get_dmp_packet() const noexcept
     {
-        DMP_Packet dmp_packet{};
+        std::array<std::uint8_t, 42UL> dmp_packet{};
 
         if (this->get_int_dmp_status()) {
             auto fifo_count{this->mpu6050_.get_fifo_count()};
@@ -224,41 +221,41 @@ namespace MPU6050 {
         return dmp_packet;
     }
 
-    QuaternionRaw DMP::get_quaternion_raw() const noexcept
+    Quat3D<std::int16_t> DMP::get_quaternion_raw() const noexcept
     {
         auto packet{this->get_dmp_packet()};
-        return QuaternionRaw{(static_cast<Raw>(packet[0]) << 8) | static_cast<Raw>(packet[1]),
-                             (static_cast<Raw>(packet[4]) << 8) | static_cast<Raw>(packet[5]),
-                             (static_cast<Raw>(packet[8]) << 8) | static_cast<Raw>(packet[9]),
-                             (static_cast<Raw>(packet[12]) << 8) | static_cast<Raw>(packet[13])};
+        return Quat3D<std::int16_t>{(static_cast<std::int16_t>(packet[0]) << 8) | static_cast<std::int16_t>(packet[1]),
+                             (static_cast<std::int16_t>(packet[4]) << 8) | static_cast<std::int16_t>(packet[5]),
+                             (static_cast<std::int16_t>(packet[8]) << 8) | static_cast<std::int16_t>(packet[9]),
+                             (static_cast<std::int16_t>(packet[12]) << 8) | static_cast<std::int16_t>(packet[13])};
     }
 
-    QuaternionScaled DMP::get_quaternion_scaled() const noexcept
+    Quat3D<float> DMP::get_quaternion_scaled() const noexcept
     {
-        return static_cast<QuaternionScaled>(this->get_quaternion_raw()) / this->mpu6050_.accel_scale_;
+        return static_cast<Quat3D<float>>(this->get_quaternion_raw()) / this->mpu6050_.accel_scale_;
     }
 
-    Gravity DMP::get_gravity() const noexcept
+    Vec3D<float> DMP::get_gravity() const noexcept
     {
         return quaternion_to_gravity(this->get_quaternion_scaled());
     }
 
-    Scaled DMP::get_roll() const noexcept
+    float DMP::get_roll() const noexcept
     {
         return quaternion_to_roll(this->get_quaternion_scaled());
     }
 
-    Scaled DMP::get_pitch() const noexcept
+    float DMP::get_pitch() const noexcept
     {
         return quaternion_to_pitch(this->get_quaternion_scaled());
     }
 
-    Scaled DMP::get_yaw() const noexcept
+    float DMP::get_yaw() const noexcept
     {
         return quaternion_to_yaw(this->get_quaternion_scaled());
     }
 
-    RollPitchYaw DMP::get_roll_pitch_yaw() const noexcept
+    Vec3D<float> DMP::get_roll_pitch_yaw() const noexcept
     {
         return quaternion_to_roll_pitch_yaw(this->get_quaternion_scaled());
     }

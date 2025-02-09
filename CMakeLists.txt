@@ -12,7 +12,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-set(CMAKE_PROJECT_NAME devcontainer-stm32-cubemx-nucleo-l476xx-clean)
+set(CMAKE_PROJECT_NAME devcontainer-stm32-cubemx-mpu6050)
 
 include("cmake/gcc-arm-none-eabi.cmake")
 
@@ -42,11 +42,10 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "Core/Src/gpio.c"
     "Core/Src/i2c.c"
     "Core/Src/usart.c"
-    "Core/Src/mpu6050_dmp.cpp"
     "Core/Inc/i2c_device.hpp"
     "Core/Src/i2c_device.cpp"
     "Core/Inc/utility.hpp"
-    "Core/Src/mpu6050_bit.cpp"
+    "Core/Src/mpu6050_dmp.cpp"
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE

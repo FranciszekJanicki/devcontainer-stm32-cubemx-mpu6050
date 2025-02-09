@@ -11,16 +11,13 @@ namespace MPU6050 {
 
     struct DMP {
     public:
-        using Scaled = MPU6050::Scaled;
-        using Raw = MPU6050::Raw;
-        using QuaternionRaw = Linalg::Quaternion3D<Raw>;
-        using QuaternionScaled = Linalg::Quaternion3D<Scaled>;
-        using RollPitchYaw = Linalg::Vector3D<Scaled>;
-        using Gravity = Linalg::Vector3D<Scaled>;
-        using DMP_Packet = std::array<std::uint8_t, 42UL>;
+        template <typename T>
+        using Vec3D = Utility::Vector3D<T>;
+
+        template <typename T>
+        using Quat3D = Utility::Quaternion3D<T>;
 
         DMP() noexcept = default;
-
         DMP(MPU6050&& mpu6050) noexcept;
 
         DMP(DMP const& other) noexcept = delete;
@@ -31,17 +28,17 @@ namespace MPU6050 {
 
         ~DMP() noexcept;
 
-        [[nodiscard]] Scaled get_roll() const noexcept;
-        [[nodiscard]] Scaled get_pitch() const noexcept;
-        [[nodiscard]] Scaled get_yaw() const noexcept;
-        [[nodiscard]] RollPitchYaw get_roll_pitch_yaw() const noexcept;
+        [[nodiscard]] float get_roll() const noexcept;
+        [[nodiscard]] float get_pitch() const noexcept;
+        [[nodiscard]] float get_yaw() const noexcept;
+        [[nodiscard]] Vec3D<float> get_roll_pitch_yaw() const noexcept;
 
     private:
-        static Gravity quaternion_to_gravity(QuaternionScaled const& quaternion) noexcept;
-        static RollPitchYaw quaternion_to_roll_pitch_yaw(QuaternionScaled const& quaternion) noexcept;
-        static Scaled quaternion_to_roll(QuaternionScaled const& quaternion) noexcept;
-        static Scaled quaternion_to_pitch(QuaternionScaled const& quaternion) noexcept;
-        static Scaled quaternion_to_yaw(QuaternionScaled const& quaternion) noexcept;
+        static Vec3D<float> quaternion_to_gravity(Quat3D<float> const& quaternion) noexcept;
+        static Vec3D<float> quaternion_to_roll_pitch_yaw(Quat3D<float> const& quaternion) noexcept;
+        static float quaternion_to_roll(Quat3D<float> const& quaternion) noexcept;
+        static float quaternion_to_pitch(Quat3D<float> const& quaternion) noexcept;
+        static float quaternion_to_yaw(Quat3D<float> const& quaternion) noexcept;
 
         static constexpr auto DMP_MEMORY_BANKS{8};
         static constexpr auto DMP_MEMORY_BANK_SIZE{256UL};
@@ -49,9 +46,9 @@ namespace MPU6050 {
         static constexpr auto FIFO_DEFAULT_TIMEOUT{11000};
         static constexpr auto FIFO_MAX_COUNT{1024UL};
 
-        QuaternionRaw get_quaternion_raw() const noexcept;
-        QuaternionScaled get_quaternion_scaled() const noexcept;
-        Gravity get_gravity() const noexcept;
+        Quat3D<std::int16_t> get_quaternion_raw() const noexcept;
+        Quat3D<float> get_quaternion_scaled() const noexcept;
+        Vec3D<float> get_gravity() const noexcept;
 
         void initialize() noexcept;
         void initialize_dmp() const noexcept;
@@ -113,7 +110,7 @@ namespace MPU6050 {
         void set_dmp_config1(std::uint8_t const config) const noexcept;
         void set_dmp_config2(std::uint8_t const config) const noexcept;
 
-        DMP_Packet get_dmp_packet() const noexcept;
+        std::array<std::uint8_t, 42UL> get_dmp_packet() const noexcept;
 
         bool initialized_{false};
 

@@ -1,7 +1,6 @@
 #ifndef MPU6050_HPP
 #define MPU6050_HPP
 
-#include "common.hpp"
 #include "i2c_device.hpp"
 #include "mpu6050_registers.hpp"
 #include "stm32l4xx_hal.h"
@@ -131,13 +130,9 @@ namespace MPU6050 {
             FREQ_40 = 0x3,
         };
 
-        using Scaled = float;
-        using GyroScaled = Linalg::Vector3D<Scaled>;   // radians
-        using AccelScaled = Linalg::Vector3D<Scaled>;  // m/s^2
-        using RollPitchYaw = Linalg::Vector3D<Scaled>; // degrees
-        using Raw = std::int16_t;
-        using GyroRaw = Linalg::Vector3D<Raw>;
-        using AccelRaw = Linalg::Vector3D<Raw>;
+        template <typename T>
+        using Vec3D = Utility::Vector3D<T>;
+
         using I2CDevice = Utility::I2CDevice;
 
         MPU6050() noexcept = default;
@@ -157,36 +152,36 @@ namespace MPU6050 {
         ~MPU6050() noexcept;
 
         /* celsius */
-        [[nodiscard]] Scaled get_temperature_celsius() const noexcept;
+        [[nodiscard]] float get_temperature_celsius() const noexcept;
 
         /* meters per square second */
-        [[nodiscard]] AccelScaled get_acceleration_scaled() const noexcept;
-        [[nodiscard]] Scaled get_acceleration_x_scaled() const noexcept;
-        [[nodiscard]] Scaled get_acceleration_y_scaled() const noexcept;
-        [[nodiscard]] Scaled get_acceleration_z_scaled() const noexcept;
+        [[nodiscard]] Vec3D<float> get_acceleration_scaled() const noexcept;
+        [[nodiscard]] float get_acceleration_x_scaled() const noexcept;
+        [[nodiscard]] float get_acceleration_y_scaled() const noexcept;
+        [[nodiscard]] float get_acceleration_z_scaled() const noexcept;
 
         /* radians */
-        [[nodiscard]] GyroScaled get_rotation_scaled() const noexcept;
-        [[nodiscard]] Scaled get_rotation_x_scaled() const noexcept;
-        [[nodiscard]] Scaled get_rotation_y_scaled() const noexcept;
-        [[nodiscard]] Scaled get_rotation_z_scaled() const noexcept;
+        [[nodiscard]] Vec3D<float> get_rotation_scaled() const noexcept;
+        [[nodiscard]] float get_rotation_x_scaled() const noexcept;
+        [[nodiscard]] float get_rotation_y_scaled() const noexcept;
+        [[nodiscard]] float get_rotation_z_scaled() const noexcept;
 
         /* degrees */
-        [[nodiscard]] RollPitchYaw get_roll_pitch_yaw() const noexcept;
-        [[nodiscard]] Scaled get_roll() const noexcept;
-        [[nodiscard]] Scaled get_pitch() const noexcept;
-        [[nodiscard]] Scaled get_yaw() const noexcept;
+        [[nodiscard]] Vec3D<float> get_roll_pitch_yaw() const noexcept;
+        [[nodiscard]] float get_roll() const noexcept;
+        [[nodiscard]] float get_pitch() const noexcept;
+        [[nodiscard]] float get_yaw() const noexcept;
 
-        static Scaled gyro_range_to_scale(GyroRange const gyro_range) noexcept;
-        static Scaled accel_range_to_scale(AccelRange const accel_range) noexcept;
+        static float gyro_range_to_scale(GyroRange const gyro_range) noexcept;
+        static float accel_range_to_scale(AccelRange const accel_range) noexcept;
         static std::uint8_t get_sampling_divider(std::uint32_t const sampling_rate, DLPF const dlpf) noexcept;
 
-        static RollPitchYaw accel_to_roll_pitch_yaw(AccelScaled const& accel_scaled) noexcept;
-        static Scaled accel_to_roll(AccelScaled const& accel_scaled) noexcept;
-        static Scaled accel_to_pitch(AccelScaled const& accel_scaled) noexcept;
-        static Scaled accel_to_yaw(AccelScaled const& accel_scaled) noexcept;
+        static Vec3D<float> accel_to_roll_pitch_yaw(Vec3D<float> const& accel_scaled) noexcept;
+        static float accel_to_roll(Vec3D<float> const& accel_scaled) noexcept;
+        static float accel_to_pitch(Vec3D<float> const& accel_scaled) noexcept;
+        static float accel_to_yaw(Vec3D<float> const& accel_scaled) noexcept;
 
-        static std::uint8_t slave_num_to_address(std::uint8_t const num) noexcept;
+        static uint8_t slave_num_to_address(uint8_t const num) noexcept;
         static std::uint8_t slave_num_to_register(std::uint8_t const num) noexcept;
         static std::uint8_t slave_num_to_control(std::uint8_t const num) noexcept;
         static std::uint8_t slave_num_to_output_byte(std::uint8_t const num) noexcept;
@@ -294,17 +289,17 @@ namespace MPU6050 {
         bool get_int_i2c_master_status() const noexcept;
         bool get_int_data_ready_status() const noexcept;
 
-        AccelRaw get_acceleration_raw() const noexcept;
-        Raw get_acceleration_x_raw() const noexcept;
-        Raw get_acceleration_y_raw() const noexcept;
-        Raw get_acceleration_z_raw() const noexcept;
+        Vec3D<std::int16_t> get_acceleration_raw() const noexcept;
+        std::int16_t get_acceleration_x_raw() const noexcept;
+        std::int16_t get_acceleration_y_raw() const noexcept;
+        std::int16_t get_acceleration_z_raw() const noexcept;
 
-        Raw get_temperature_raw() const noexcept;
+        std::int16_t get_temperature_raw() const noexcept;
 
-        GyroRaw get_rotation_raw() const noexcept;
-        Raw get_rotation_x_raw() const noexcept;
-        Raw get_rotation_y_raw() const noexcept;
-        Raw get_rotation_z_raw() const noexcept;
+        Vec3D<std::int16_t> get_rotation_raw() const noexcept;
+        std::int16_t get_rotation_x_raw() const noexcept;
+        std::int16_t get_rotation_y_raw() const noexcept;
+        std::int16_t get_rotation_z_raw() const noexcept;
 
         std::uint8_t get_external_sensor_byte(std::uint8_t const position) const noexcept;
         std::uint16_t get_external_sensor_word(std::uint8_t const position) const noexcept;
@@ -366,8 +361,8 @@ namespace MPU6050 {
 
         I2CDevice i2c_device_{};
 
-        Scaled gyro_scale_{};
-        Scaled accel_scale_{};
+        float gyro_scale_{};
+        float accel_scale_{};
     };
 
 }; // namespace MPU6050
