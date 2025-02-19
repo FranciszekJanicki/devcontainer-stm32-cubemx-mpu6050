@@ -46,12 +46,12 @@ int main()
                                    .zg_st = false,
                                    .fs_sel = gyro_range_to_scale(GyroRange::GYRO_FS_250)};
 
-    auto smplrt_div = SMPLRT_DIV{.smplrt_div = smplrt_to_divider(8000U, DLPF::BW_5)};
+    auto smplrt_div = SMPLRT_DIV{.smplrt_div = smplrt_to_divider(8000U, DLPF::BW_256)};
 
-    auto int_pin_cfg = INT_PIN_CFG{.int_level = std::to_underlying(IntMode::ACTIVELOW),
+    auto int_pin_cfg = INT_PIN_CFG{.int_level = std::to_underlying(IntMode::ACTIVEHIGH),
                                    .int_open = std::to_underlying(IntDrive::PUSHPULL),
-                                   .latch_int_en = std::to_underlying(IntLatch::PULSE50US),
-                                   .int_rd_clear = std::to_underlying(IntClear::ANYREAD),
+                                   .latch_int_en = std::to_underlying(IntClear::ANYREAD),
+                                   .int_rd_clear = std::to_underlying(IntLatch::PULSE50US),
                                    .fsync_int_level = false,
                                    .fsync_int_en = false,
                                    .i2c_bypass_en = false,
@@ -66,15 +66,46 @@ int main()
                                  .dmp_int_en = false,
                                  .raw_rdy_int_en = true};
 
-    auto mpu6050 =
-        MPU6050::MPU6050{std::move(i2c_device), config, accel_config, gyro_config, smplrt_div, int_pin_cfg, int_enable};
+    auto user_ctrl = USER_CTRL{.dmp_en = false,
+                               .fifo_en = false,
+                               .i2c_mst_en = false,
+                               .i2c_if_dis = false,
+                               .dmp_reset = false,
+                               .fifo_reset = false,
+                               .i2c_mst_reset = false,
+                               .sig_cond_reset = false};
+
+    auto pwr_mgmt_1 = PWR_MGMT_1{.device_reset = false,
+                                 .sleep = false,
+                                 .cycle = false,
+                                 .temp_dis = false,
+                                 .clksel = std::to_underlying(Clock::PLL_ZGYRO)};
+
+    auto pwr_mgmt_2 = PWR_MGMT_2{.lp_wake_ctrl = false,
+                                 .stby_xa = false,
+                                 .stby_ya = false,
+                                 .stby_za = false,
+                                 .stby_xg = false,
+                                 .stby_yg = false,
+                                 .stby_yz = false};
+
+    auto mpu6050 = MPU6050::MPU6050{std::move(i2c_device),
+                                    config,
+                                    accel_config,
+                                    gyro_config,
+                                    smplrt_div,
+                                    int_pin_cfg,
+                                    int_enable,
+                                    user_ctrl,
+                                    pwr_mgmt_1,
+                                    pwr_mgmt_2};
 
     while (true) {
-        if (timer_elapsed) {
-            auto const& [roll, pitch, yaw]{mpu6050.get_roll_pitch_yaw().value()};
-            printf("roll: %f, pitch %f, yaw: %f\n\r", roll, pitch, yaw);
-            timer_elapsed = false;
-        }
+        // if (timer_elapsed) {
+        auto const& [roll, pitch, yaw]{mpu6050.get_roll_pitch_yaw().value()};
+        printf("roll: %f, pitch %f, yaw: %f\n\r", roll, pitch, yaw);
+        timer_elapsed = false;
+        // }
     }
 
     return 0;

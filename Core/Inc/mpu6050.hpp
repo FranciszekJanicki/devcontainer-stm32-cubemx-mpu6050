@@ -21,7 +21,10 @@ namespace MPU6050 {
                 GYRO_CONFIG const gyro_config,
                 SMPLRT_DIV const smplrt_div,
                 INT_PIN_CFG const int_pin_cfg,
-                INT_ENABLE const int_enable) noexcept;
+                INT_ENABLE const int_enable,
+                USER_CTRL const user_ctrl,
+                PWR_MGMT_1 const pwr_mgmt_1,
+                PWR_MGMT_2 const pwr_mgmt_2) noexcept;
 
         MPU6050(MPU6050 const& other) noexcept = delete;
         MPU6050(MPU6050&& other) noexcept = default;
@@ -75,7 +78,10 @@ namespace MPU6050 {
                         GYRO_CONFIG const gyro_config,
                         SMPLRT_DIV const smplrt_div,
                         INT_PIN_CFG const int_pin_cfg,
-                        INT_ENABLE const int_enable) noexcept;
+                        INT_ENABLE const int_enable,
+                        USER_CTRL const user_ctrl,
+                        PWR_MGMT_1 const pwr_mgmt_1,
+                        PWR_MGMT_2 const pwr_mgmt_2) noexcept;
 
         void deinitialize() noexcept;
 

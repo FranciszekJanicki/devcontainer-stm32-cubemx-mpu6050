@@ -18,12 +18,23 @@ namespace MPU6050 {
                      GYRO_CONFIG const gyro_config,
                      SMPLRT_DIV const smplrt_div,
                      INT_PIN_CFG const int_pin_cfg,
-                     INT_ENABLE const int_enable) noexcept :
+                     INT_ENABLE const int_enable,
+                     USER_CTRL const user_ctrl,
+                     PWR_MGMT_1 const pwr_mgmt_1,
+                     PWR_MGMT_2 const pwr_mgmt_2) noexcept :
         i2c_device_{std::forward<I2CDevice>(i2c_device)},
         accel_scale_{accel_range_to_scale((AccelRange)accel_config.afs_sel)},
         gyro_scale_{gyro_range_to_scale((GyroRange)gyro_config.fs_sel)}
     {
-        this->initialize(config, accel_config, gyro_config, smplrt_div, int_pin_cfg, int_enable);
+        this->initialize(config,
+                         accel_config,
+                         gyro_config,
+                         smplrt_div,
+                         int_pin_cfg,
+                         int_enable,
+                         user_ctrl,
+                         pwr_mgmt_1,
+                         pwr_mgmt_2);
     }
 
     MPU6050::~MPU6050() noexcept
@@ -114,12 +125,13 @@ namespace MPU6050 {
 
     void MPU6050::device_reset() const noexcept
     {
-        this->set_pwr_mgmt_1_register(std::bit_cast<PWR_MGMT_1>(static_cast<std::uint8_t>(0b10000000)));
+        this->set_pwr_mgmt_1_register(std::bit_cast<PWR_MGMT_1>(std::uint8_t{0b10000000}));
+        HAL_Delay(200);
     }
 
     void MPU6050::device_wake_up() const noexcept
     {
-        this->set_pwr_mgmt_1_register(std::bit_cast<PWR_MGMT_1>(static_cast<std::uint8_t>(0b00000000)));
+        this->set_pwr_mgmt_1_register(std::bit_cast<PWR_MGMT_1>(std::uint8_t{0b10000000}));
         HAL_Delay(200);
     }
 
@@ -138,7 +150,10 @@ namespace MPU6050 {
                              GYRO_CONFIG const gyro_config,
                              SMPLRT_DIV const smplrt_div,
                              INT_PIN_CFG const int_pin_cfg,
-                             INT_ENABLE const int_enable) noexcept
+                             INT_ENABLE const int_enable,
+                             USER_CTRL const user_ctrl,
+                             PWR_MGMT_1 const pwr_mgmt_1,
+                             PWR_MGMT_2 const pwr_mgmt_2) noexcept
     {
         if (this->is_valid_device_id()) {
             this->device_reset();
@@ -149,6 +164,9 @@ namespace MPU6050 {
             this->set_smplrt_div_register(smplrt_div);
             this->set_int_pin_cfg_register(int_pin_cfg);
             this->set_int_enable_register(int_enable);
+            this->set_user_ctrl_register(user_ctrl);
+            this->set_pwr_mgmt_1_register(pwr_mgmt_1);
+            this->set_pwr_mgmt_2_register(pwr_mgmt_2);
             this->initialized_ = true;
         }
     }
