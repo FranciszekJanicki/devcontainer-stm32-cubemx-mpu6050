@@ -330,8 +330,9 @@ namespace MPU6050 {
         bool latch_int_en : 1;
         bool int_rd_clear : 1;
         bool fsync_int_level : 1;
+        bool fsync_int_en : 1;
         bool i2c_bypass_en : 1;
-        bool : 1;
+        bool clock_output : 1;
     } packed;
 
     struct INT_ENABLE {
