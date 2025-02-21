@@ -1,6 +1,6 @@
 #include "i2c_device.hpp"
 
-namespace Utility {
+namespace Serial {
 
     I2CDevice::I2CDevice(I2CHandle const i2c_bus, std::uint16_t const dev_address) noexcept :
         i2c_bus_{i2c_bus}, dev_address_{dev_address}
@@ -48,21 +48,6 @@ namespace Utility {
         return this->read_words<1UL>(reg_address)[0];
     }
 
-    void I2CDevice::read_bytes(std::uint8_t const reg_address,
-                               std::uint8_t* const bytes,
-                               std::size_t const size) const noexcept
-    {
-        if (this->initialized_) {
-            HAL_I2C_Mem_Read(this->i2c_bus_,
-                             this->dev_address_ << 1,
-                             reg_address,
-                             sizeof(reg_address),
-                             bytes,
-                             size,
-                             TIMEOUT);
-        }
-    }
-
     std::uint8_t I2CDevice::read_byte(std::uint8_t const reg_address) const noexcept
     {
         return this->read_bytes<1UL>(reg_address)[0];
@@ -72,12 +57,12 @@ namespace Utility {
                                       std::uint8_t const position,
                                       std::size_t const size) const noexcept
     {
-        return get_bits(this->read_byte(reg_address), size, position);
+        return Utility::read_bits(this->read_byte(reg_address), size, position);
     }
 
     bool I2CDevice::read_bit(std::uint8_t const reg_address, std::uint8_t const position) const noexcept
     {
-        return get_bit(this->read_byte(reg_address), position);
+        return Utility::read_bit(this->read_byte(reg_address), position);
     }
 
     void I2CDevice::write_dword(std::uint8_t const reg_address, std::uint32_t const dword) const noexcept
@@ -88,21 +73,6 @@ namespace Utility {
     void I2CDevice::write_word(std::uint8_t const reg_address, std::uint16_t const word) const noexcept
     {
         this->write_words(reg_address, std::array<std::uint16_t, 1UL>{word});
-    }
-
-    void I2CDevice::write_bytes(std::uint8_t const reg_address,
-                                std::uint8_t* const bytes,
-                                std::size_t const size) const noexcept
-    {
-        if (this->initialized_) {
-            HAL_I2C_Mem_Write(this->i2c_bus_,
-                              this->dev_address_ << 1,
-                              reg_address,
-                              sizeof(reg_address),
-                              bytes,
-                              size,
-                              TIMEOUT);
-        }
     }
 
     void I2CDevice::write_byte(std::uint8_t const reg_address, std::uint8_t const byte) const noexcept
@@ -116,7 +86,7 @@ namespace Utility {
                                std::size_t const size) const noexcept
     {
         std::uint8_t write{this->read_byte(reg_address)};
-        set_bits(write, bits, size, position);
+        Utility::write_bits(write, bits, size, position);
         this->write_byte(reg_address, write);
     }
 
@@ -124,7 +94,7 @@ namespace Utility {
     I2CDevice::write_bit(std::uint8_t const reg_address, bool const bit, std::uint8_t const position) const noexcept
     {
         std::uint8_t write{this->read_byte(reg_address)};
-        set_bit(write, bit, position);
+        Utility::write_bit(write, bit, position);
         this->write_byte(reg_address, write);
     }
 
@@ -142,4 +112,4 @@ namespace Utility {
         }
     }
 
-}; // namespace Utility
+}; // namespace Serial
