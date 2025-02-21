@@ -783,8 +783,8 @@ namespace MPU6050 {
         }
         auto buffer = this->i2c_device_.read_bytes<6>(std::to_underlying(RA::ACCEL_XOUT_H));
         return Vec3D<std::int16_t>{(static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]),
-                        (static_cast<std::int16_t>(buffer[2]) << 8) | static_cast<std::int16_t>(buffer[3]),
-                        (static_cast<std::int16_t>(buffer[4]) << 8) | static_cast<std::int16_t>(buffer[5])};
+                                   (static_cast<std::int16_t>(buffer[2]) << 8) | static_cast<std::int16_t>(buffer[3]),
+                                   (static_cast<std::int16_t>(buffer[4]) << 8) | static_cast<std::int16_t>(buffer[5])};
     }
 
     std::int16_t MPU6050::get_acceleration_x_raw() const noexcept
@@ -830,8 +830,8 @@ namespace MPU6050 {
         }
         auto buffer = this->i2c_device_.read_bytes<6>(std::to_underlying(RA::GYRO_XOUT_H));
         return Vec3D<std::int16_t>{(static_cast<std::int16_t>(buffer[0]) << 8) | static_cast<std::int16_t>(buffer[1]),
-                       (static_cast<std::int16_t>(buffer[2]) << 8) | static_cast<std::int16_t>(buffer[3]),
-                       (static_cast<std::int16_t>(buffer[4]) << 8) | static_cast<std::int16_t>(buffer[5])};
+                                   (static_cast<std::int16_t>(buffer[2]) << 8) | static_cast<std::int16_t>(buffer[3]),
+                                   (static_cast<std::int16_t>(buffer[4]) << 8) | static_cast<std::int16_t>(buffer[5])};
     }
 
     std::int16_t MPU6050::get_rotation_x_raw() const noexcept

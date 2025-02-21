@@ -2,10 +2,10 @@
 #define VECTOR3D_HPP
 
 #include "quaternion3d.hpp"
+#include <cassert>
 #include <cmath>
 #include <compare>
 #include <concepts>
-#include <cassert>
 #include <exception>
 #include <stdexcept>
 #include <utility>
@@ -14,7 +14,7 @@ namespace Utility {
 
     template <typename T>
     struct Vector3D {
-        [[nodiscard]] T distance( Vector3D const& other) const noexcept
+        [[nodiscard]] T distance(Vector3D const& other) const noexcept
         {
             return std::sqrt(std::pow(this->x - other.x, 2) + std::pow(this->y - other.y, 2) +
                              std::pow(this->z - other.z, 2));
@@ -25,7 +25,7 @@ namespace Utility {
             return std::sqrt(std::pow(this->x, 2) + std::pow(this->y, 2) + std::pow(this->z, 2));
         }
 
-        [[nodiscard]] Vector3D rotated( Quaternion3D<T> const& quaternion)const noexcept
+        [[nodiscard]] Vector3D rotated(Quaternion3D<T> const& quaternion) const noexcept
         {
             Quaternion3D p(0, this->x, this->y, this->z);
             p *= quaternion;
@@ -33,7 +33,7 @@ namespace Utility {
             return Vector3D{p.x, p.y, p.z};
         }
 
-        void rotate( Quaternion3D<T> const& quaternion) noexcept
+        void rotate(Quaternion3D<T> const& quaternion) noexcept
         {
             Quaternion3D p(0, this->x, this->y, this->z);
             p *= quaternion;
@@ -43,7 +43,7 @@ namespace Utility {
             this->z = p.z;
         }
 
-        [[nodiscard]] Vector3D normalized()const noexcept
+        [[nodiscard]] Vector3D normalized() const noexcept
         {
             const auto im{T{1} / this->magnitude()};
             return Vector3D{this->x * im, this->y * im, this->z * im};
@@ -55,7 +55,7 @@ namespace Utility {
             *this *= im;
         }
 
-        [[nodiscard]] Vector3D& operator+=( Vector3D const& other) noexcept
+        [[nodiscard]] Vector3D& operator+=(Vector3D const& other) noexcept
         {
             this->x += other.x;
             this->y += other.y;
@@ -63,7 +63,7 @@ namespace Utility {
             return *this;
         }
 
-        [[nodiscard]] Vector3D& operator-=( Vector3D const& other) noexcept
+        [[nodiscard]] Vector3D& operator-=(Vector3D const& other) noexcept
         {
             this->x -= other.x;
             this->y -= other.y;
@@ -71,7 +71,7 @@ namespace Utility {
             return *this;
         }
 
-        [[nodiscard]] Vector3D& operator*=( T const factor)
+        [[nodiscard]] Vector3D& operator*=(T const factor)
         {
             this->x *= factor;
             this->y *= factor;
@@ -79,7 +79,7 @@ namespace Utility {
             return *this;
         }
 
-        [[nodiscard]] Vector3D& operator/=( T const factor)
+        [[nodiscard]] Vector3D& operator/=(T const factor)
         {
             if (factor == static_cast<T>(0)) {
                 assert(true);
@@ -97,7 +97,7 @@ namespace Utility {
             return Vector3D<C>{static_cast<C>(this->x), static_cast<C>(this->y), static_cast<C>(this->z)};
         }
 
-        [[nodiscard]] bool operator<=>( Vector3D const& other)const noexcept = default;
+        [[nodiscard]] bool operator<=>(Vector3D const& other) const noexcept = default;
 
         T x{};
         T y{};
@@ -138,6 +138,6 @@ namespace Utility {
         return Vector3D<T>{vector.x / factor, vector.y / factor, vector.z / factor};
     }
 
-}; // namespace Linalg
+}; // namespace Utility
 
 #endif // VECTOR3D_HPP

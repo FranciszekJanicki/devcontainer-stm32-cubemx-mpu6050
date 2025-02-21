@@ -28,6 +28,7 @@ int main()
     MX_I2C1_Init();
 
     using namespace Utility;
+    using namespace MPU6050;
     using MPU6050 = MPU6050::MPU6050;
 
     I2CDevice i2c_device{&hi2c1, std::to_underlying(MPU6050::DevAddress::AD0_LOW)};
@@ -40,7 +41,7 @@ int main()
                     MPU6050::DHPF::DHPF_RESET};
 
     using namespace MPU6050;
-    DMP mpu6050_dmp{std::move(mpu6050)};
+    MPU6050_DMP mpu6050_dmp{std::move(mpu6050)};
 
     while (true) {
         if (timer_elapsed) {

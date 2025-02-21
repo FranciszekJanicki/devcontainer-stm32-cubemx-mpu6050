@@ -1,6 +1,7 @@
 #ifndef I2C_DEVICE_HPP
 #define I2C_DEVICE_HPP
 
+#include "common.hpp"
 #include "stm32l4xx_hal.h"
 #include "utility.hpp"
 #include <array>
@@ -58,7 +59,8 @@ namespace Utility {
 
         template <std::size_t SIZE>
         std::array<std::uint8_t, SIZE> read_bytes(std::uint8_t const reg_address) const noexcept;
-        void read_bytes(std::uint8_t const reg_address, std::uint8_t *const bytes, std::size_t const size) const noexcept;
+        void
+        read_bytes(std::uint8_t const reg_address, std::uint8_t* const data, std::size_t const size) const noexcept;
         std::uint8_t read_byte(std::uint8_t const reg_address) const noexcept;
 
         std::uint8_t
@@ -75,7 +77,8 @@ namespace Utility {
 
         template <std::size_t SIZE>
         void write_bytes(std::uint8_t const reg_address, std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
-        void write_bytes(std::uint8_t const reg_address, std::uint8_t* const bytes, std::size_t const size) const noexcept;
+        void
+        write_bytes(std::uint8_t const reg_address, std::uint8_t* const data, std::size_t const size) const noexcept;
         void write_byte(std::uint8_t const reg_address, std::uint8_t const byte) const noexcept;
 
         void write_bits(std::uint8_t const reg_address,
@@ -101,13 +104,13 @@ namespace Utility {
     template <std::size_t SIZE>
     void I2CDevice::transmit_dwords(std::array<std::uint32_t, SIZE> const& dwords) const noexcept
     {
-        this->transmit_bytes(dwords_to_bytes(dwords));
+        this->transmit_bytes(Utility::dwords_to_bytes(dwords));
     }
 
     template <std::size_t SIZE>
     void I2CDevice::transmit_words(std::array<std::uint16_t, SIZE> const& words) const noexcept
     {
-        this->transmit_bytes(words_to_bytes(words));
+        this->transmit_bytes(Utility::words_to_bytes(words));
     }
 
     template <std::size_t SIZE>
@@ -122,13 +125,13 @@ namespace Utility {
     template <std::size_t SIZE>
     std::array<std::uint32_t, SIZE> I2CDevice::receive_dwords() const noexcept
     {
-        return bytes_to_dwords(this->receive_bytes<4 * SIZE>());
+        return Utility::bytes_to_dwords(this->receive_bytes<4 * SIZE>());
     }
 
     template <std::size_t SIZE>
     std::array<std::uint16_t, SIZE> I2CDevice::receive_words() const noexcept
     {
-        return bytes_to_words(this->receive_bytes<2 * SIZE>());
+        return Utility::bytes_to_words(this->receive_bytes<2 * SIZE>());
     }
 
     template <std::size_t SIZE>
@@ -144,13 +147,13 @@ namespace Utility {
     template <std::size_t SIZE>
     std::array<std::uint32_t, SIZE> I2CDevice::read_dwords(std::uint8_t const reg_address) const noexcept
     {
-        return bytes_to_dwords(this->read_bytes<4 * SIZE>(reg_address));
+        return Utility::bytes_to_dwords(this->read_bytes<4 * SIZE>(reg_address));
     }
 
     template <std::size_t SIZE>
     std::array<std::uint16_t, SIZE> I2CDevice::read_words(std::uint8_t const reg_address) const noexcept
     {
-        return bytes_to_words(this->read_bytes<2 * SIZE>(reg_address));
+        return Utility::bytes_to_words(this->read_bytes<2 * SIZE>(reg_address));
     }
 
     template <std::size_t SIZE>
@@ -173,14 +176,14 @@ namespace Utility {
     void I2CDevice::write_dwords(std::uint8_t const reg_address,
                                  std::array<std::uint32_t, SIZE> const& dwords) const noexcept
     {
-        this->write_bytes(reg_address, dwords_to_bytes(dwords));
+        this->write_bytes(reg_address, Utility::dwords_to_bytes(dwords));
     }
 
     template <std::size_t SIZE>
     void I2CDevice::write_words(std::uint8_t const reg_address,
                                 std::array<std::uint16_t, SIZE> const& words) const noexcept
     {
-        this->write_bytes(reg_address, words_to_bytes(words));
+        this->write_bytes(reg_address, Utility::words_to_bytes(words));
     }
 
     template <std::size_t SIZE>

@@ -1,5 +1,5 @@
-#ifndef DMP_HPP
-#define DMP_HPP
+#ifndef MPU6050_DMP_HPP
+#define MPU6050_DMP_HPP
 
 #include "mpu6050.hpp"
 #include "quaternion3d.hpp"
@@ -9,7 +9,7 @@
 
 namespace MPU6050 {
 
-    struct DMP {
+    struct MPU6050_DMP {
     public:
         template <typename T>
         using Vec3D = Utility::Vector3D<T>;
@@ -17,16 +17,16 @@ namespace MPU6050 {
         template <typename T>
         using Quat3D = Utility::Quaternion3D<T>;
 
-        DMP() noexcept = default;
-        DMP(MPU6050&& mpu6050) noexcept;
+        MPU6050_DMP() noexcept = default;
+        MPU6050_DMP(MPU6050&& mpu6050) noexcept;
 
-        DMP(DMP const& other) noexcept = delete;
-        DMP(DMP&& other) noexcept = default;
+        MPU6050_DMP(MPU6050_DMP const& other) noexcept = delete;
+        MPU6050_DMP(MPU6050_DMP&& other) noexcept = default;
 
-        DMP& operator=(DMP const& other) noexcept = delete;
-        DMP& operator=(DMP&& other) noexcept = default;
+        MPU6050_DMP& operator=(MPU6050_DMP const& other) noexcept = delete;
+        MPU6050_DMP& operator=(MPU6050_DMP&& other) noexcept = default;
 
-        ~DMP() noexcept;
+        ~MPU6050_DMP() noexcept;
 
         [[nodiscard]] float get_roll() const noexcept;
         [[nodiscard]] float get_pitch() const noexcept;
@@ -119,4 +119,4 @@ namespace MPU6050 {
 
 }; // namespace MPU6050
 
-#endif // DMP_HPP
+#endif // MPU6050_DMP_HPP
